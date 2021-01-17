@@ -10,6 +10,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
+using EatAndDrink.Repository.Data;
+using EatAndDrink.Repository;
 
 namespace EatAndDrink.WebApi
 {
@@ -25,7 +28,18 @@ namespace EatAndDrink.WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            services.AddScoped<SeedingServices>();
+            services.AddScoped<EatDrinkRepository>();
+
+            //Context Start
             services.AddControllers();
+            services.AddDbContext<EDContext>(MySql
+            => MySql.UseMySql(Configuration
+            .GetConnectionString("EatDrinkConnection")
+            , Migration => Migration.MigrationsAssembly("EatAndDrink.WebApi")
+            //Context And
+            ));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
