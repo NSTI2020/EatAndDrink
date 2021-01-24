@@ -1,13 +1,14 @@
 using System.Threading.Tasks;
 using EatAndDrink.Domain.Entities;
 using EatAndDrink.Repository;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EatAndDrink.WebApi.Controllers
 {
 
     [ApiController]
-    [Route("api/{controller}")]
+    [Route("api/[controller]")]
     public class Products : ControllerBase
     {
         private readonly EatDrinkRepository _repo;
@@ -16,20 +17,25 @@ namespace EatAndDrink.WebApi.Controllers
             _repo = repo;
         }
 
-        [HttpGet("Get")]
+        [HttpGet("get")]
         public async Task<IActionResult> Get()
         {
-            Product[] result = await _repo.GetAllProducts();
+            try
+            {
+                Product[] result = await _repo.GetAllProducts();
 
-            return Ok(result);
+                if (result != null)
+                {
+                    return Ok(result);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Erro: {ex.Message}");
+            }
 
-
+            return BadRequest();
         }
-
-
-
-
-
 
     }
 }
